@@ -1,1 +1,1 @@
-# Stage_3IA_caledar_project
+# Stage 3IA Calendar project
