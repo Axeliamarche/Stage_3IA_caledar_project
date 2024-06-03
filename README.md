@@ -23,3 +23,12 @@ Il progetto Robot Reservation System è un'applicazione Flutter che consente agl
    ```sh
    git clone https://github.com/tuo-username/robot-reservation-system.git
    cd robot-reservation-system
+## Modifiche Calendar
+-Se é già passato il giorno e l'ora di una reservation si cancella
+ -Temi che cambiano scrollando 
+-Cambiare foto robot
+-La prima volta che un utente mette una password per loggarsi potrà usare solo quella
+-Modalità scura e modalità chiara
+-Icona dell'app
+-Creare un robot
+-Scrollabile
