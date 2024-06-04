@@ -47,7 +47,20 @@ class ReservationModel extends ChangeNotifier {
     _reservations.removeWhere((reservation) => reservation.date == date);
     notifyListeners();
   }
-
+  
+    void removeExpiredReservations() {
+    final now = DateTime.now();
+    _reservations.removeWhere((reservation) {
+      final endDateTime = DateTime(
+        reservation.date.year,
+        reservation.date.month,
+        reservation.date.day,
+      );
+      return endDateTime.isBefore(now);
+    });
+    notifyListeners();
+  }
+  
   bool hasReservation(DateTime day) {
     return _reservations.any((reservation) => reservation.date == day);
   }
