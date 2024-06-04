@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'models/reservation_model.dart';
 import 'robot_page.dart';
+import 'dart:async';
 
 void main() {
   runApp(MyApp());
@@ -23,10 +24,10 @@ class MyApp extends StatelessWidget {
 
 class ReservationPage extends StatefulWidget {
   @override
-  _ReservationPageState createState() => _ReservationPageState();
+  ReservationPageState createState() => ReservationPageState();
 }
 
-class _ReservationPageState extends State<ReservationPage> {
+class ReservationPageState extends State<ReservationPage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   String? _loggedInUser;
   int _selectedIndex = 0;
@@ -36,6 +37,16 @@ class _ReservationPageState extends State<ReservationPage> {
   void initState() {
     super.initState();
     _reservationModel = Provider.of<ReservationModel>(context, listen: false);
+     _timer = Timer.periodic(Duration(minutes: 1), (timer) {
+      _reservationModel.removeExpiredReservations();
+    });
+  }
+  
+  @override
+  void dispose() {
+    // Cancella il timer quando il widget viene distrutto
+    _timer.cancel();
+    super.dispose();
   }
 
   @override
@@ -94,7 +105,7 @@ class _ReservationPageState extends State<ReservationPage> {
             CalendarFormat.week: 'Month',
           },
           selectedDayPredicate: (day) {
-            return _reservationModel.hasReservation(day);
+            return day.isAfter(DateTime.now().subtract(Duration(days: 1))) && _reservationModel.hasReservation(day);
           },
           calendarStyle: CalendarStyle(
             selectedDecoration: BoxDecoration(
