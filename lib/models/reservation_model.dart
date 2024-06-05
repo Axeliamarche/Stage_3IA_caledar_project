@@ -19,14 +19,14 @@ class Reservation {
 class ReservationModel extends ChangeNotifier {
   final List<Reservation> _reservations = [];
 
-  List<Reservation> getReservations() => _reservations;
+  List<Reservation> getReservations() => _reservations; 
 
   List<int> getReservedRobots(DateTime date) {
     return _reservations
         .where((reservation) => reservation.date == date)
         .expand((reservation) => reservation.selectedRobots)
         .toList();
-  }
+  } 
 
   void addReservation(DateTime date, String startTime, String endTime, List<int> selectedRobots, String name) {
     if (_reservations.any((reservation) => reservation.name == name)) {
@@ -47,8 +47,8 @@ class ReservationModel extends ChangeNotifier {
     _reservations.removeWhere((reservation) => reservation.date == date);
     notifyListeners();
   }
-  
-    void removeExpiredReservations() {
+
+  void removeExpiredReservations() {
     final now = DateTime.now();
     _reservations.removeWhere((reservation) {
       final endDateTime = DateTime(
@@ -60,10 +60,11 @@ class ReservationModel extends ChangeNotifier {
     });
     notifyListeners();
   }
-  
+
   bool hasReservation(DateTime day) {
     return _reservations.any((reservation) => reservation.date == day);
   }
+
 
   int getTotalAvailableRobotsInMonth(DateTime currentMonth, List<Reservation> reservations) {
   // Calcola la data di inizio e fine del mese corrente
@@ -84,26 +85,26 @@ class ReservationModel extends ChangeNotifier {
   }
 
   return totalAvailableRobots;
-}
-
-int getTotalAvailableRobotsInWeek(DateTime currentWeek, List<Reservation> reservations) {
-  // Calcola la data di inizio e fine della settimana corrente
-  final DateTime firstDayOfWeek = currentWeek.subtract(Duration(days: currentWeek.weekday - 1));
-  final DateTime lastDayOfWeek = firstDayOfWeek.add(Duration(days: 6));
-
-  // Conteggio dei robot disponibili nella settimana corrente
-  int totalAvailableRobots = 0;
-  for (DateTime date = firstDayOfWeek; date.isBefore(lastDayOfWeek.add(Duration(days: 1))); date = date.add(Duration(days: 1))) {
-    totalAvailableRobots += 20; // Numero totale di robot disponibili per giorno
   }
 
-  // Sottrai il numero di robot già prenotati
-  for (var reservation in reservations) {
-    if (reservation.date.isAfter(firstDayOfWeek.subtract(Duration(days: 1))) && reservation.date.isBefore(lastDayOfWeek.add(Duration(days: 1)))) {
-      totalAvailableRobots -= reservation.selectedRobots.length;
+  int getTotalAvailableRobotsInWeek(DateTime currentWeek, List<Reservation> reservations) {
+    // Calcola la data di inizio e fine della settimana corrente
+    final DateTime firstDayOfWeek = currentWeek.subtract(Duration(days: currentWeek.weekday - 1));
+    final DateTime lastDayOfWeek = firstDayOfWeek.add(Duration(days: 6));
+
+    // Conteggio dei robot disponibili nella settimana corrente
+    int totalAvailableRobots = 0;
+    for (DateTime date = firstDayOfWeek; date.isBefore(lastDayOfWeek.add(Duration(days: 1))); date = date.add(Duration(days: 1))) {
+      totalAvailableRobots += 20; // Numero totale di robot disponibili per giorno
     }
-  }
+
+    // Sottrai il numero di robot già prenotati
+    for (var reservation in reservations) {
+      if (reservation.date.isAfter(firstDayOfWeek.subtract(Duration(days: 1))) && reservation.date.isBefore(lastDayOfWeek.add(Duration(days: 1)))) {
+        totalAvailableRobots -= reservation.selectedRobots.length;
+      }
+    }
 
   return totalAvailableRobots;
-}
+  }
 }
