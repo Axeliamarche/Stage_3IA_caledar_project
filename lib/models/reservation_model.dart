@@ -14,6 +14,24 @@ class Reservation {
     required this.selectedRobots,
     required this.name,
   });
+  
+  TimeOfDay _timeOfDayFromString(String time) {
+    final parts = time.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = int.parse(parts[1]);
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
+   DateTime get endDateTime {
+    final endTimeOfDay = _timeOfDayFromString(endTime);
+    return DateTime(
+      date.year,
+      date.month,
+      date.day,
+      endTimeOfDay.hour,
+      endTimeOfDay.minute,
+    );
+  }
 }
 
 class ReservationModel extends ChangeNotifier {
@@ -50,14 +68,7 @@ class ReservationModel extends ChangeNotifier {
 
   void removeExpiredReservations() {
     final now = DateTime.now();
-    _reservations.removeWhere((reservation) {
-      final endDateTime = DateTime(
-        reservation.date.year,
-        reservation.date.month,
-        reservation.date.day,
-      );
-      return endDateTime.isBefore(now);
-    });
+    _reservations.removeWhere((reservation) => reservation.endDateTime.isBefore(now));
     notifyListeners();
   }
 
