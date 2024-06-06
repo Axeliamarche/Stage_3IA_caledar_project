@@ -35,6 +35,7 @@ class ReservationPageState extends State<ReservationPage> {
   int _selectedIndex = 0;
   late ReservationModel _reservationModel;
   late Timer _timer;
+  DateTime _focusedDay = DateTime.now();
 
   @override
   void initState() {
@@ -101,7 +102,7 @@ class ReservationPageState extends State<ReservationPage> {
         Consumer<ReservationModel>(
           builder: (context, reservationModel, child) {
             return TableCalendar(
-              focusedDay: DateTime.now(),
+              focusedDay: _focusedDay,
               firstDay: DateTime(2000),
               lastDay: DateTime(2100),
               calendarFormat: _calendarFormat,
@@ -118,6 +119,9 @@ class ReservationPageState extends State<ReservationPage> {
                 ),
               ),
               onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _focusedDay = focusedDay; // Aggiornare il focusedDay quando si seleziona un giorno
+                });
                 if (selectedDay.isAfter(DateTime.now().subtract(Duration(days: 1)))) {
                   Navigator.push(
                     context,
@@ -131,37 +135,46 @@ class ReservationPageState extends State<ReservationPage> {
                   );
                 }
               },
+              onPageChanged: (focusedDay) {
+                setState(() {
+                  _focusedDay = focusedDay; // Aggiornare il focusedDay quando si cambia pagina
+                });
+              },
             );
           },
         ),
         SizedBox(height: 20),
-        Consumer<ReservationModel>(
-          builder: (context, reservationModel, child) {
-            final reservations = reservationModel.getReservations();
-            return Column(
-              children: reservations.map((reservation) {
-                final isUserEvent = reservation.name == _loggedInUser;
-                return Column(
-                  children: [
-                    Text(
-                      'Prenotazione di ${reservation.name}: ${reservation.startTime} - ${reservation.endTime}, ${reservation.selectedRobots.length} robot',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    if (isUserEvent)
-                      ElevatedButton(
-                        onPressed: () {
-                          reservationModel.removeReservation(reservation.date);
-                        },
-                        child: Text('Elimina'),
-                      ),
-                  ],
-                );
-              }).toList(),
-            );
-          },
+        Expanded(
+          child: Consumer<ReservationModel>(
+            builder: (context, reservationModel, child) {
+              final reservations = reservationModel.getReservations();
+              return ListView.builder(
+                itemCount: reservations.length,
+                itemBuilder: (context, index) {
+                  final reservation = reservations[index];
+                  final isUserEvent = reservation.name == _loggedInUser;
+                  return ListTile(
+                    minTileHeight: 5,
+                    horizontalTitleGap: 5,
+                    title: Text('Prenotazione di ${reservation.name}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            ),
+                    subtitle: Text('${reservation.startTime} - ${reservation.endTime}, ${reservation.selectedRobots.length} robot'),
+                    trailing: isUserEvent
+                                ? ElevatedButton(
+                                  onPressed: () {
+                                    reservationModel.removeReservation(reservation.date);
+                                  },
+                                  child: Text('Elimina'),
+                                  )
+                                : null
+                  );
+                },
+              );
+            },
+          ),
         ),
       ],
     );
