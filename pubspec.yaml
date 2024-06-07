@@ -1,0 +1,41 @@
+name: robot_calendar
+description: A new Flutter project.
+
+publish_to: 'none' # Remove this line if you are planning to publish your package.
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.19.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.0.0
+  table_calendar: ^3.0.9
+  shared_preferences: ^2.0.6
+  cupertino_icons: ^1.0.2
+  
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: "^0.11.0"
+  flutter_app_name: ^0.1.0
+
+flutter_app_name: 
+  name: "CalendaRobot"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png"
+  
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/robot1.png
+    - assets/check.png
+    - assets/cross.png
+    - assets/icon/icon.png
+
