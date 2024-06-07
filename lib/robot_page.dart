@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:robot_calendar/models/reservation_model.dart';
-import 'dart:convert';
 
+// E' una pagina per gestire i robot da prenotare
 class RobotPage extends StatefulWidget {
   final DateTime selectedDay;
 
-  const RobotPage({Key? key, required this.selectedDay}) : super(key: key);
+  const RobotPage({super.key, required this.selectedDay});
 
   @override
-  _RobotPageState createState() => _RobotPageState();
+  RobotPageState createState() => RobotPageState();
 }
-
-class _RobotPageState extends State<RobotPage> {
+// Aggiorna il stato dell robot da prenotare 
+class RobotPageState extends State<RobotPage> {
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
   final List<int> _selectedRobots = [];
@@ -24,7 +24,7 @@ class _RobotPageState extends State<RobotPage> {
     super.initState();
     _loadLoggedInUser();
   }
-
+  // Sincronizza i dati dell'utente che sta facendo una prenotazione
   Future<void> _loadLoggedInUser() async {
     final prefs = await SharedPreferences.getInstance();
     final loggedInUser = prefs.getString('loggedInUser') ?? '';
@@ -32,7 +32,7 @@ class _RobotPageState extends State<RobotPage> {
       _nameController.text = loggedInUser;
     });
   }
-
+  // Crea il layout dei blocchi nella pagina  
   @override
   Widget build(BuildContext context) {
     final reservationModel = Provider.of<ReservationModel>(context);
@@ -88,7 +88,6 @@ class _RobotPageState extends State<RobotPage> {
               itemCount: 20,
               itemBuilder: (context, index) {
                 final isReservedByOthers = reservedRobots.contains(index);
-
                 return GestureDetector(
                   onLongPress: () {
                     Navigator.push(
@@ -174,17 +173,17 @@ class _RobotPageState extends State<RobotPage> {
     );
   }
 }
-
+// La pagina delle caratteristiche del robot
 class RobotCharacteristicsPage extends StatefulWidget {
   final int selectedRobot;
 
-  const RobotCharacteristicsPage({Key? key, required this.selectedRobot}) : super(key: key);
+  const RobotCharacteristicsPage({super.key, required this.selectedRobot});
 
   @override
-  _RobotCharacteristicsPageState createState() => _RobotCharacteristicsPageState();
+  RobotCharacteristicsPageState createState() => RobotCharacteristicsPageState();
 }
 
-class _RobotCharacteristicsPageState extends State<RobotCharacteristicsPage> {
+class RobotCharacteristicsPageState extends State<RobotCharacteristicsPage> {
   late TextEditingController _gpuController;
   late TextEditingController _cpuController;
   late TextEditingController _romController;
@@ -193,6 +192,7 @@ class _RobotCharacteristicsPageState extends State<RobotCharacteristicsPage> {
   bool _networkCard = false;
   bool _bluetooth = false;
 
+  // Aggiorna dati salvati dall'utente
   @override
   void initState() {
     super.initState();
@@ -202,7 +202,7 @@ class _RobotCharacteristicsPageState extends State<RobotCharacteristicsPage> {
     _ramController = TextEditingController();
     _loadRobotCharacteristics();
   }
-
+  // Carica le caratteristiche dei robot  
   Future<void> _loadRobotCharacteristics() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -215,7 +215,7 @@ class _RobotCharacteristicsPageState extends State<RobotCharacteristicsPage> {
       _bluetooth = prefs.getBool('bluetooth_${widget.selectedRobot}') ?? false;
     });
   }
-
+  // Salva le caratteristiche dei robot
   Future<void> _saveRobotCharacteristics() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('gpu_${widget.selectedRobot}', _gpuController.text);
@@ -227,6 +227,7 @@ class _RobotCharacteristicsPageState extends State<RobotCharacteristicsPage> {
     await prefs.setBool('bluetooth_${widget.selectedRobot}', _bluetooth);
   }
 
+  // Crea una pagina di specifiche delle robot 
   @override
   Widget build(BuildContext context) {
     return Scaffold(

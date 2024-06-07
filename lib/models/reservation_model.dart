@@ -36,7 +36,7 @@ class Reservation {
   }
 }
 
-
+// La logica di riservare robot
 class ReservationModel extends ChangeNotifier {
   final List<Reservation> _reservations = [];
 
@@ -48,7 +48,7 @@ class ReservationModel extends ChangeNotifier {
         .expand((reservation) => reservation.selectedRobots)
         .toList();
   }
-
+  // aggiunge la riservazione a gli utenti\robot
   void addReservation(DateTime date, String startTime, String endTime, List<int> selectedRobots, String name) {
     if (_reservations.any((reservation) => reservation.name == name)) {
       throw Exception('This name is been already used.');
@@ -63,24 +63,24 @@ class ReservationModel extends ChangeNotifier {
     _reservations.add(newReservation);
     notifyListeners();
   }
-
+  // Cancella la riservazione all'utente
   void removeReservation(DateTime date) {
     _reservations.removeWhere((reservation) => reservation.date == date);
     notifyListeners();
   }
-
+  // Cancella la riservazione dopo la scadenza
   void removeExpiredReservations() {
     final now = DateTime.now();
     _reservations.removeWhere((reservation) => reservation.endDateTime.isBefore(now));
     notifyListeners();
   }
-
+  // Controlla il tempo di riservazione
   bool hasReservation(DateTime day) {
     return _reservations.any((reservation) => reservation.date == day);
   }
-
+  // prende il valore tot dei robot disponibili nel mese 
   int getTotalAvailableRobotsInMonth(DateTime currentMonth, List<Reservation> reservations) {
-    // Calcola la data di inizio e fine del mese corrente
+    // Calcola la data dell'inizio e fine del mese corrente
     final DateTime firstDayOfMonth = DateTime(currentMonth.year, currentMonth.month, 1);
     final DateTime lastDayOfMonth = DateTime(currentMonth.year, currentMonth.month + 1, 0);
 
@@ -99,9 +99,9 @@ class ReservationModel extends ChangeNotifier {
 
     return totalAvailableRobots;
   }
-
+  // prende il valore tot dei robot disponibili nella settimana 
   int getTotalAvailableRobotsInWeek(DateTime currentWeek, List<Reservation> reservations) {
-    // Calcola la data di inizio e fine della settimana corrente
+    // Calcola la data dell'inizio e fine della settimana corrente
     final DateTime firstDayOfWeek = currentWeek.subtract(Duration(days: currentWeek.weekday - 1));
     final DateTime lastDayOfWeek = firstDayOfWeek.add(const Duration(days: 6));
 

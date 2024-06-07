@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'models/reservation_model.dart';
-import 'robot_page.dart';
-import 'dart:async';
+import 'package:flutter/material.dart'; // Libreria base che aggiunge
+import 'package:provider/provider.dart'; // La libreriache serve per aggiornare i dati all'interno del widget 
+import 'package:table_calendar/table_calendar.dart'; // La libreria che serve per utilizzare il calendario
+import 'package:shared_preferences/shared_preferences.dart'; // La libreria che serve per salvare i dati di utenti, appuntamenti e i robot prenotati
+import 'models/reservation_model.dart'; // La libreria con la logica per gestire riservazioni dei robot
+import 'robot_page.dart'; // La libreria che contiene la pagina della prenotazione dei robot
+import 'dart:async'; // La libreria che permette di implementare i timer all interno del programma
 
 
 void main() {
@@ -14,6 +14,7 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  // Costruisce e gestisce i widget
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -57,6 +58,7 @@ class RobotCharacteristics {
   });
 }
 
+// Aggiorna il login di un utente 
 class UserModel with ChangeNotifier {
   String? _loggedInUser;
 
@@ -72,38 +74,39 @@ class UserModel with ChangeNotifier {
     notifyListeners();
   }
 }
-
+ // La pagina principale
 class ReservationPage extends StatefulWidget {
   const ReservationPage({super.key});
 
   @override
-  _ReservationPageState createState() => _ReservationPageState();
+  ReservationPageState createState() => ReservationPageState();
 }
-
-class _ReservationPageState extends State<ReservationPage> {
+  // 
+class ReservationPageState extends State<ReservationPage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   int _selectedIndex = 0;
   late ReservationModel _reservationModel;
-  late UserModel _userModel;
   late Timer _timer;
+   DateTime _focusedDay = DateTime.now();
 
+  // La funzione per aggiornare lo stato di programma per ogni ogetto creato
   @override
   void initState() {
     super.initState();
     _reservationModel = Provider.of<ReservationModel>(context, listen: false);
-    _userModel = Provider.of<UserModel>(context, listen: false);
-    _timer = Timer.periodic(Duration(seconds: 10), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
       _reservationModel.removeExpiredReservations();
     });
   }
   
+  // Cancella il timer quando il widget viene distrutto
   @override
   void dispose() {
-    // Cancella il timer quando il widget viene distrutto
     _timer.cancel();
     super.dispose();
   }
 
+  // Crea un blocco nel layout munito di titolo e bottoni sopra il calendario
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -156,13 +159,13 @@ class _ReservationPageState extends State<ReservationPage> {
       ),
     );
   }
-
+  //Crea al centro della ReservationPage un calendario
   Widget _buildCalendarPage(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         TableCalendar(
-          focusedDay: DateTime.now(),
+          focusedDay: _focusedDay,
           firstDay: DateTime(2000),
           lastDay: DateTime(2100),
           calendarFormat: _calendarFormat,
@@ -179,7 +182,10 @@ class _ReservationPageState extends State<ReservationPage> {
             ),
           ),
           onDaySelected: (selectedDay, focusedDay) {
-                if (selectedDay.isAfter(DateTime.now().subtract(Duration(days: 1)))) {
+            setState(() {
+                  _focusedDay = focusedDay; // Aggiornare il focusedDay quando si seleziona un giorno
+                });
+                if (selectedDay.isAfter(DateTime.now().subtract(const Duration(days: 1)))) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -188,46 +194,62 @@ class _ReservationPageState extends State<ReservationPage> {
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('You cant select a previous date.')),
+                    const SnackBar(content: Text('You cant select a previous date.')),
                   );
                 }
               },
-        ),
-        const SizedBox(height: 20),
-        Consumer2<ReservationModel, UserModel>(
-          builder: (context, reservationModel, userModel, child) {
-            final reservations = reservationModel.getReservations();
-            return Column(
-              children: reservations.map((reservation) {
-                final isUserEvent = reservation.name == userModel.loggedInUser;
-                return Column(
-                  children: [
-                    Text(
-                      'Reservation of ${reservation.name}: ${reservation.startTime} - ${reservation.endTime}, ${reservation.selectedRobots.length} robot',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    if (isUserEvent)
-                      ElevatedButton(
-                        onPressed: () {
-                          if (reservation.name == userModel.loggedInUser) {
-                            reservationModel.removeReservation(reservation.date);
-                          }
-                        },
-                        child: const Text('Delete'),
-                      ),
-                  ],
-                );
-              }).toList(),
-            );
+          onPageChanged: (focusedDay) {
+                setState(() {
+                  _focusedDay = focusedDay; // Aggiornare il focusedDay quando si cambia pagina
+                });
+              },
+          onFormatChanged: (calendarFormat) { 
+            setState(() {
+              _calendarFormat = calendarFormat == CalendarFormat.month ? CalendarFormat.week : CalendarFormat.month;
+            });
           },
         ),
+
+        const SizedBox(height: 20),
+
+        Expanded(
+            child: Consumer2<ReservationModel, UserModel>(
+              builder: (context, reservationModel, userModel, child) {
+                final reservations = reservationModel.getReservations();
+                return ListView.builder(
+                  itemCount: reservations.length,
+                  itemBuilder: (context, index) {
+                    final reservation = reservations[index];
+                    final isUserEvent = reservation.name == userModel.loggedInUser;
+                    return ListTile(
+                      minTileHeight: 5,
+                      horizontalTitleGap: 5,
+                      title: Text('Prenotazione di ${reservation.name}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                      ),
+                      subtitle: Text('${reservation.startTime} - ${reservation.endTime}, ${reservation.selectedRobots.length} robot'),
+                      trailing: isUserEvent
+                                  ? ElevatedButton(
+                                    onPressed: () {
+                                      if(reservation.name == userModel.loggedInUser){
+                                      reservationModel.removeReservation(reservation.date);
+                                      }
+                                    },
+                                    child: Text('Elimina'),
+                                    )
+                                  : null
+                    );
+                  },
+                );
+              },
+            ),
+          ),
       ],
     );
   }
-
+  // Crea una pagina Warehouse con informazioni di robot a disposizione e riservazioni dagli utenti
   Widget _buildWarehousePage() {
     final currentDate = _calendarFormat == CalendarFormat.week ? DateTime.now() : DateTime.now().subtract(Duration(days: DateTime.now().day - 1));
     final totalAvailableRobots = _calendarFormat == CalendarFormat.month
@@ -269,13 +291,13 @@ class _ReservationPageState extends State<ReservationPage> {
       ),
     );
   }
-
+  // Il controllo per cambiare le pagine tra il calendario e la warehouse
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
-
+  // aggiunge una finestra per mettere le credenziali dell'utente
   void _showLoginDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -346,7 +368,7 @@ class _ReservationPageState extends State<ReservationPage> {
     );
   }
 }
-
+// Widget per gestire i temi dell'applicazione
 class ThemeModel with ChangeNotifier {
   bool _isDarkMode = false;
 
