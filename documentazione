@@ -1,0 +1,67 @@
+Documentazione dell'App di Prenotazione dei Robot
+  
+Panoramica
+  
+L'applicazione di prenotazione dei robot consente agli utenti di visualizzare e gestire le prenotazioni di robot all'interno di un magazzino. Gli utenti possono selezionare specifiche date dal calendario, scegliere i robot disponibili e confermare le prenotazioni. La gestione dello stato e delle prenotazioni viene effettuata tramite un modello centralizzato che mantiene i dati persistenti utilizzando le preferenze condivise.
+Componenti Principali
+  
+1. File main.dart
+  
+Funzione principale: Inizializza l'applicazione e configura i provider per la gestione dello stato.
+Classe UserModel: Gestisce l'utente attualmente loggato e le sue preferenze.
+Classe ReservationModel: Gestisce le prenotazioni, inclusa la loro memorizzazione e il recupero dallo storage locale.
+Classe MyApp: Configura il tema e imposta la home page dell'app.
+  
+2. File reservation_page.dart
+  
+Classe ReservationPage: La pagina principale che include la visualizzazione del calendario e dello stato del magazzino.
+Widget TableCalendar: Permette agli utenti di selezionare le date per le prenotazioni.
+Widget bottomNavigationBar: Fornisce la navigazione tra le diverse visualizzazioni dell'app, come il calendario e lo stato del magazzino.
+Dialog di Login: Visualizza un pop-up per il login, permettendo agli utenti di accedere inserendo il loro nome utente.
+  
+3. File robot_page.dart
+  
+Classe RobotPage: Gestisce la selezione dei robot disponibili per una specifica data.
+Selezione dei robot: Gli utenti possono selezionare o deselezionare i robot disponibili e confermare le loro scelte.
+Bottoni di conferma: Gli utenti possono confermare le loro prenotazioni, che verranno poi salvate nel sistema.
+4. File reservation_model.dart
+Classe Reservation: Definisce la struttura di una prenotazione, inclusi dettagli come la data, il nome dell'utente e i robot selezionati.
+Metodi di serializzazione: Fornisce metodi per convertire le prenotazioni in formato JSON e viceversa.
+Classe ReservationModel: Gestisce l'elenco delle prenotazioni, incluse l'aggiunta, la rimozione e il recupero delle prenotazioni dallo storage locale.
+Calcolo dei robot disponibili: Include metodi per calcolare quanti robot sono disponibili in un determinato periodo (mese o settimana).
+  
+Funzionalità Principali
+  
+1. Visualizzazione del Calendario
+  
+Permette agli utenti di selezionare le date per cui desiderano effettuare prenotazioni.
+  
+2. Gestione delle Prenotazioni
+  
+Gli utenti possono selezionare i robot disponibili e confermare le prenotazioni per le date scelte.
+Le prenotazioni vengono salvate e recuperate dallo storage locale per persistenza.
+3. Login dell'Utente
+Un dialogo di login consente agli utenti di accedere inserendo il loro nome utente.
+Una volta loggati, possono effettuare e gestire le prenotazioni.
+  
+4. Visualizzazione dello Stato del Magazzino
+  
+Visualizza il numero di robot disponibili in un dato periodo, basato sulle prenotazioni esistenti.
+Fornisce una panoramica della disponibilità dei robot in base alla vista selezionata (mensile o settimanale).
+  
+5. Gestione dello Stato Persistente
+  
+Utilizza SharedPreferences per salvare e caricare le prenotazioni, garantendo che le informazioni siano persistenti tra le sessioni.
+  
+Dettagli Tecnici
+  
+Flutter e Dart: L'app è sviluppata utilizzando il framework Flutter e il linguaggio Dart.
+Provider: Gestisce lo stato e la logica di business attraverso il pacchetto provider.
+SharedPreferences: Memorizza localmente le preferenze e i dati delle prenotazioni.
+  
+Estendibilità
+  
+L'app è progettata per essere facilmente estendibile. È possibile aggiungere nuove funzionalità come:
+Filtri avanzati per la selezione dei robot.
+Notifiche per ricordare agli utenti le loro prenotazioni.
+Visualizzazioni aggiuntive per analizzare l'utilizzo dei robot.
